@@ -33,6 +33,10 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.PwmControl;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.ServoImplEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 /*
@@ -73,6 +77,15 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
     private DcMotor rightFrontDrive = null;
     private DcMotor rightBackDrive = null;
 
+    private DcMotor shoulder_right = null;
+    private DcMotor shoulder_left = null;
+
+    private ServoImplEx claw = null;
+    private ServoImplEx wrist_right = null;
+    private ServoImplEx wrist_left = null;
+
+
+
     @Override
     public void runOpMode() {
 
@@ -82,6 +95,23 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
         leftBackDrive  = hardwareMap.get(DcMotor.class, "left_back_drive");
         rightFrontDrive = hardwareMap.get(DcMotor.class, "right_front_drive");
         rightBackDrive = hardwareMap.get(DcMotor.class, "right_back_drive");
+
+        // shoulder
+        shoulder_right = hardwareMap.get(DcMotor.class, "shoulder_right");
+        shoulder_left = hardwareMap.get(DcMotor.class, "shoulder_left");
+        shoulder_right.setDirection(DcMotor.Direction.FORWARD);
+        shoulder_left.setDirection(DcMotor.Direction.REVERSE);
+
+        shoulder_right.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        shoulder_left.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+
+        claw = hardwareMap.get(ServoImplEx.class, "claw");
+        claw.setPwmRange(new PwmControl.PwmRange(500, 2500));
+        wrist_right = hardwareMap.get(ServoImplEx.class, "wrist_right");
+        wrist_right.setPwmRange(new PwmControl.PwmRange(500, 2500));
+        wrist_left = hardwareMap.get(ServoImplEx.class, "wrist_left");
+        wrist_left.setPwmRange(new PwmControl.PwmRange(500, 2500));
 
         // ########################################################################################
         // !!!            IMPORTANT Drive Information. Test your motor directions.            !!!!!
@@ -157,11 +187,43 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
             leftBackDrive.setPower(leftBackPower);
             rightBackDrive.setPower(rightBackPower);
 
+            shoulder_right.setPower(gamepad2.right_stick_y);
+            shoulder_left.setPower(gamepad2.right_stick_y);
+
+            if (gamepad2.b) {
+                claw.setPosition(0.60); // outward
+            }
+
+            if (gamepad2.x) {
+                claw.setPosition(1); // inward
+            }
+
+            // The servo on the left is a direct mirror to the servo on the right
+            // It's actions must be the inverse of its opposite.
+            if (gamepad2.dpad_down) {
+                // down
+                wrist_right.setPosition(0.10); // wrist_right <= wrist_left for going down
+                wrist_left.setPosition(0.80);
+            }
+
+            if (gamepad2.dpad_up) {
+                // up
+                wrist_right.setPosition(0.5);
+                wrist_left.setPosition(0.5);
+            }
+
+            if (gamepad2.dpad_right) {
+                wrist_right.setPosition(0.60);
+                wrist_left.setPosition(0.40);
+            }
+
+
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
             telemetry.addData("Back  left/Right", "%4.2f, %4.2f", leftBackPower, rightBackPower);
+
+            telemetry.addData("Gamepad 2 Joystick Right", "%4.2f", gamepad2.right_stick_y);
             telemetry.update();
         }
     }}
-

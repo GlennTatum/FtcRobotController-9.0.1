@@ -84,6 +84,11 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
     private ServoImplEx wrist_right = null;
     private ServoImplEx wrist_left = null;
 
+    private boolean servoDirection = false;
+
+    private double wristRightVal = 0.5;
+    private double wristLeftVal = 0.5;
+
 
 
     @Override
@@ -202,27 +207,47 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
 
             // The servo on the left is a direct mirror to the servo on the right
             // It's actions must be the inverse of its opposite.
+
+
             if (gamepad2.dpad_down) {
-                // down
-                wrist_right.setPosition(0.25); // wrist_right <= wrist_left for going down
-                wrist_left.setPosition(0.75);
+                // set servoDirection mode to down
+                servoDirection = false;
             }
 
             if (gamepad2.dpad_up) {
-                // up
-                wrist_right.setPosition(0.5);
-                wrist_left.setPosition(0.5);
+                // set servoDirection mode to up
+                servoDirection = true;
             }
 
-            if (gamepad2.dpad_right) {
-                wrist_right.setPosition(0.60);
-                wrist_left.setPosition(0.40);
+            if ((servoDirection) && (gamepad2.y)) {
+                // Reset servo ratio to start moving upwards
+                if (wristRightVal < 0.5 && wristLeftVal < 0.5) {
+                    wristRightVal = 0.5;
+                    wristLeftVal = 0.5;
+                }
+
+                // set L < R for upwards movement
+                wristRightVal += 0.05;
+                wristLeftVal -= 0.05;
+
+                wrist_right.setPosition(wristRightVal);
+                wrist_left.setPosition(wristLeftVal);
             }
 
-            if (gamepad2.dpad_left) {
-                // TODO Set to 30 deg position angle for placement
-                wrist_right.setPosition(0.45); // wrist_right <= wrist_left for going down
-                wrist_left.setPosition(0.55);
+            if ((!servoDirection) && (gamepad2.a)) {
+                // Reset values to start moving upwards
+                if (wristRightVal > 0.5 && wristLeftVal > 0.5) {
+                    wristRightVal = 0.5;
+                    wristLeftVal = 0.5;
+                }
+
+                // set L > R for downwards movement
+                wristRightVal -= 0.05;
+                wristLeftVal += 0.05;
+
+                wrist_right.setPosition(wristRightVal);
+                wrist_left.setPosition(wristLeftVal);
+
             }
 
 

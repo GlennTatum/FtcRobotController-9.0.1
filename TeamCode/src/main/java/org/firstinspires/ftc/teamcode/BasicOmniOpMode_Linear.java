@@ -180,15 +180,17 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
             rightFrontPower = gamepad1.y ? 1.0 : 0.0;  // Y gamepad
             rightBackPower  = gamepad1.b ? 1.0 : 0.0;  // B gamepad
             */
-
             // Send calculated power to wheels
             leftFrontDrive.setPower(leftFrontPower);
             rightFrontDrive.setPower(rightFrontPower);
             leftBackDrive.setPower(leftBackPower);
             rightBackDrive.setPower(rightBackPower);
 
-            shoulder_right.setPower(gamepad2.right_stick_y);
-            shoulder_left.setPower(gamepad2.right_stick_y);
+            float shoulder_right_stick_y = -gamepad2.right_stick_y;
+
+            // TODO Plug in encoders to set a desired position during movement
+            shoulder_right.setPower(shoulder_right_stick_y);
+            shoulder_left.setPower(shoulder_right_stick_y);
 
             if (gamepad2.b) {
                 claw.setPosition(0.60); // outward
@@ -202,8 +204,8 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
             // It's actions must be the inverse of its opposite.
             if (gamepad2.dpad_down) {
                 // down
-                wrist_right.setPosition(0.10); // wrist_right <= wrist_left for going down
-                wrist_left.setPosition(0.80);
+                wrist_right.setPosition(0.25); // wrist_right <= wrist_left for going down
+                wrist_left.setPosition(0.75);
             }
 
             if (gamepad2.dpad_up) {
@@ -215,6 +217,12 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
             if (gamepad2.dpad_right) {
                 wrist_right.setPosition(0.60);
                 wrist_left.setPosition(0.40);
+            }
+
+            if (gamepad2.dpad_left) {
+                // TODO Set to 30 deg position angle for placement
+                wrist_right.setPosition(0.45); // wrist_right <= wrist_left for going down
+                wrist_left.setPosition(0.55);
             }
 
 

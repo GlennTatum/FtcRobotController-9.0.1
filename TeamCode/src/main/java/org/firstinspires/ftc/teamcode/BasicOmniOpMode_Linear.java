@@ -84,8 +84,6 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
     private ServoImplEx wrist_right = null;
     private ServoImplEx wrist_left = null;
 
-    private boolean servoDirection = false;
-
     private double wristRightVal = 0.5;
     private double wristLeftVal = 0.5;
 
@@ -210,16 +208,37 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
 
 
             if (gamepad2.dpad_down) {
-                // set servoDirection mode to down
-                servoDirection = false;
+                // Reset values to start moving upwards
+                if (wristRightVal > 0.5 && wristLeftVal > 0.5) {
+                    wristRightVal = 0.5;
+                    wristLeftVal = 0.5;
+                }
+
+                // set L > R for downwards movement
+                wristRightVal -= 0.10;
+                wristLeftVal += 0.10;
+
+                wrist_right.setPosition(wristRightVal);
+                wrist_left.setPosition(wristLeftVal);
             }
 
             if (gamepad2.dpad_up) {
                 // set servoDirection mode to up
-                servoDirection = true;
+                // Reset servo ratio to start moving upwards
+                if (wristRightVal < 0.5 && wristLeftVal < 0.5) {
+                    wristRightVal = 0.5;
+                    wristLeftVal = 0.5;
+                }
+
+                // set L < R for upwards movement
+                wristRightVal += 0.10;
+                wristLeftVal -= 0.10;
+
+                wrist_right.setPosition(wristRightVal);
+                wrist_left.setPosition(wristLeftVal);
             }
 
-            if ((servoDirection) && (gamepad2.y)) {
+            if ((gamepad2.y)) {
                 // Reset servo ratio to start moving upwards
                 if (wristRightVal < 0.5 && wristLeftVal < 0.5) {
                     wristRightVal = 0.5;
@@ -234,7 +253,7 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
                 wrist_left.setPosition(wristLeftVal);
             }
 
-            if ((!servoDirection) && (gamepad2.a)) {
+            if ((gamepad2.a)) {
                 // Reset values to start moving upwards
                 if (wristRightVal > 0.5 && wristLeftVal > 0.5) {
                     wristRightVal = 0.5;
@@ -258,7 +277,6 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
             telemetry.addData("Back  left/Right", "%4.2f, %4.2f", leftBackPower, rightBackPower);
 
             telemetry.addData("Servo Wrist Right/Left", "4.2f, 4.2f", wristRightVal, wristLeftVal);
-            telemetry.addData("Servo Wrist Direction Mode", "%b", servoDirection);
 
             telemetry.addData("Gamepad 2 Joystick Right y-axis", "%4.2f", gamepad2.right_stick_y);
             telemetry.update();

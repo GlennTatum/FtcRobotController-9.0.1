@@ -253,10 +253,14 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
+
             telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
             telemetry.addData("Back  left/Right", "%4.2f, %4.2f", leftBackPower, rightBackPower);
 
-            telemetry.addData("Gamepad 2 Joystick Right", "%4.2f", gamepad2.right_stick_y);
+            telemetry.addData("Servo Wrist Right/Left", "4.2f, 4.2f", wristRightVal, wristLeftVal);
+            telemetry.addData("Servo Wrist Direction Mode", "%b", servoDirection);
+
+            telemetry.addData("Gamepad 2 Joystick Right y-axis", "%4.2f", gamepad2.right_stick_y);
             telemetry.update();
         }
     }}

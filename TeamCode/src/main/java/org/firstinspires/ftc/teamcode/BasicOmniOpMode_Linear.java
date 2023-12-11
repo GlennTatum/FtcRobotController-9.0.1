@@ -33,6 +33,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -84,8 +85,8 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
     private ServoImplEx wrist_right = null;
     private ServoImplEx wrist_left = null;
 
-    private double wristRightVal = 0.5;
-    private double wristLeftVal = 0.5;
+    private double wristRightVal = 0.0;
+    private double wristLeftVal = 0.0;
 
 
 
@@ -184,16 +185,16 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
             rightBackPower  = gamepad1.b ? 1.0 : 0.0;  // B gamepad
             */
             // Send calculated power to wheels
-            leftFrontDrive.setPower(leftFrontPower);
-            rightFrontDrive.setPower(rightFrontPower);
-            leftBackDrive.setPower(leftBackPower);
-            rightBackDrive.setPower(rightBackPower);
+            leftFrontDrive.setPower(leftFrontPower/1.5);
+            rightFrontDrive.setPower(rightFrontPower/1.5);
+            leftBackDrive.setPower(leftBackPower/1.5);
+            rightBackDrive.setPower(rightBackPower/1.5);
 
             float shoulder_right_stick_y = -gamepad2.right_stick_y;
 
             // TODO Plug in encoders to set a desired position during movement
-            shoulder_right.setPower(shoulder_right_stick_y);
-            shoulder_left.setPower(shoulder_right_stick_y);
+            shoulder_right.setPower(shoulder_right_stick_y/1.1);
+            shoulder_left.setPower(shoulder_right_stick_y/1.1);
 
             if (gamepad2.b) {
                 claw.setPosition(0.60); // outward
@@ -206,24 +207,7 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
             // The servo on the left is a direct mirror to the servo on the right
             // It's actions must be the inverse of its opposite.
 
-
-            if (gamepad2.dpad_down) {
-                // Reset values to start moving upwards
-                if (wristRightVal > 0.5 && wristLeftVal > 0.5) {
-                    wristRightVal = 0.5;
-                    wristLeftVal = 0.5;
-                }
-
-                // set L > R for downwards movement
-                wristRightVal -= 0.10;
-                wristLeftVal += 0.10;
-
-                wrist_right.setPosition(wristRightVal);
-                wrist_left.setPosition(wristLeftVal);
-            }
-
-            if (gamepad2.dpad_up) {
-                // set servoDirection mode to up
+            if (gamepad2.y) {
                 // Reset servo ratio to start moving upwards
                 if (wristRightVal < 0.5 && wristLeftVal < 0.5) {
                     wristRightVal = 0.5;
@@ -231,29 +215,27 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
                 }
 
                 // set L < R for upwards movement
-                wristRightVal += 0.10;
-                wristLeftVal -= 0.10;
+                wristRightVal += 0.002;
+                wristLeftVal -= 0.002;
 
-                wrist_right.setPosition(wristRightVal);
-                wrist_left.setPosition(wristLeftVal);
-            }
-
-            if ((gamepad2.y)) {
-                // Reset servo ratio to start moving upwards
-                if (wristRightVal < 0.5 && wristLeftVal < 0.5) {
-                    wristRightVal = 0.5;
-                    wristLeftVal = 0.5;
+                if (wristRightVal > 1) {
+                    wristRightVal = 1;
+                }
+                if (wristLeftVal > 1) {
+                    wristLeftVal = 1;
+                }
+                if (wristRightVal < 0) {
+                    wristRightVal = 0;
+                }
+                if (wristLeftVal < 0) {
+                    wristLeftVal = 0;
                 }
 
-                // set L < R for upwards movement
-                wristRightVal += 0.05;
-                wristLeftVal -= 0.05;
-
                 wrist_right.setPosition(wristRightVal);
                 wrist_left.setPosition(wristLeftVal);
             }
 
-            if ((gamepad2.a)) {
+            if (gamepad2.a) {
                 // Reset values to start moving upwards
                 if (wristRightVal > 0.5 && wristLeftVal > 0.5) {
                     wristRightVal = 0.5;
@@ -261,8 +243,21 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
                 }
 
                 // set L > R for downwards movement
-                wristRightVal -= 0.05;
-                wristLeftVal += 0.05;
+                wristRightVal -= 0.001;
+                wristLeftVal += 0.001;
+
+                if (wristRightVal > 1) {
+                    wristRightVal = 1;
+                }
+                if (wristLeftVal > 1) {
+                    wristLeftVal = 1;
+                }
+                if (wristRightVal < 0) {
+                    wristRightVal = 0;
+                }
+                if (wristLeftVal < 0) {
+                    wristLeftVal = 0;
+                }
 
                 wrist_right.setPosition(wristRightVal);
                 wrist_left.setPosition(wristLeftVal);
@@ -276,7 +271,7 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
             telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
             telemetry.addData("Back  left/Right", "%4.2f, %4.2f", leftBackPower, rightBackPower);
 
-            telemetry.addData("Servo Wrist Right/Left", "4.2f, 4.2f", wristRightVal, wristLeftVal);
+            telemetry.addData("Servo Wrist Right/Left", "%4.2f, %4.2f", wristRightVal, wristLeftVal);
 
             telemetry.addData("Gamepad 2 Joystick Right y-axis", "%4.2f", gamepad2.right_stick_y);
             telemetry.update();
